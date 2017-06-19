@@ -260,7 +260,7 @@ namespace HpkArchiver
 
                 // Read the compressed data..
                 br.BaseStream.Position = Fragments[0].Offset;
-                var compressedData = br.ReadBytes(Fragments[0].Length + 24);
+                var compressedData = br.ReadBytes(Fragments[0].Length);
 
                 // Read the header data..
                 br.BaseStream.Position = Fragments[0].Offset + 4;
@@ -293,7 +293,7 @@ namespace HpkArchiver
                     // Handle the data accordingly..
                     if (zsize < chunkSize)
                     {
-                        var output = new byte[size];
+                        var output = new byte[chunkSize];
                         var ret = LZ4Codec.Decode(compressedData, offset, zsize, output, 0, chunkSize);
                         if (ret > 0)
                             fileData.AddRange(output.Take(ret));
