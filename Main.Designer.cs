@@ -289,7 +289,6 @@
             this.txtExtractOpen.Name = "txtExtractOpen";
             this.txtExtractOpen.Size = new System.Drawing.Size(476, 20);
             this.txtExtractOpen.TabIndex = 1;
-            this.txtExtractOpen.Text = "D:\\Games\\Steam\\steamapps\\common\\Victor Vran\\Packs\\Lua.hpk";
             // 
             // btnExtractOpen
             // 
@@ -320,7 +319,6 @@
             this.txtExtractSave.Name = "txtExtractSave";
             this.txtExtractSave.Size = new System.Drawing.Size(476, 20);
             this.txtExtractSave.TabIndex = 4;
-            this.txtExtractSave.Text = "C:\\Users\\atom0s\\Desktop\\lua_decomp";
             // 
             // btnExtractSave
             // 
@@ -408,7 +406,6 @@
             this.radTropico5.Name = "radTropico5";
             this.radTropico5.Size = new System.Drawing.Size(147, 19);
             this.radTropico5.TabIndex = 2;
-            this.radTropico5.TabStop = true;
             this.radTropico5.Text = "Tropico 5";
             this.radTropico5.UseVisualStyleBackColor = true;
             this.radTropico5.CheckedChanged += new System.EventHandler(this.GameChanged);
@@ -416,13 +413,11 @@
             // radVictorVran
             // 
             this.radVictorVran.AutoSize = true;
-            this.radVictorVran.Checked = true;
             this.radVictorVran.Dock = System.Windows.Forms.DockStyle.Fill;
             this.radVictorVran.Location = new System.Drawing.Point(462, 3);
             this.radVictorVran.Name = "radVictorVran";
             this.radVictorVran.Size = new System.Drawing.Size(147, 19);
             this.radVictorVran.TabIndex = 3;
-            this.radVictorVran.TabStop = true;
             this.radVictorVran.Text = "Victor Vran";
             this.radVictorVran.UseVisualStyleBackColor = true;
             this.radVictorVran.CheckedChanged += new System.EventHandler(this.GameChanged);
