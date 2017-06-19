@@ -248,24 +248,28 @@ namespace HpkArchiver
         {
             var errorsCaught = 0;
 
+#if DEBUG
+            Debug.WriteLine(dest);
+#endif
+
             try
             {
+                // Read the compressed data..
+                br.BaseStream.Position = this.Fragments[0].Offset;
+                var compressedData = br.ReadBytes(this.Fragments[0].Length);
+
+                // Read the header data..
+                br.BaseStream.Position = this.Fragments[0].Offset + 4;
+                var size = br.ReadInt32();
+                var chunkSize = br.ReadInt32();
+
                 // Validate the fragments size..
-                var frags = Fragments.Count;
+                var frags = this.Fragments.Count;
                 if (frags != 1)
                 {
                     MessageBox.Show($"Found invalid fragment count while extracting! Frag Count: {frags}");
                     return 1;
                 }
-
-                // Read the compressed data..
-                br.BaseStream.Position = Fragments[0].Offset;
-                var compressedData = br.ReadBytes(Fragments[0].Length);
-
-                // Read the header data..
-                br.BaseStream.Position = Fragments[0].Offset + 4;
-                var size = br.ReadInt32();
-                var chunkSize = br.ReadInt32();
 
                 // Determine the number of chunks..
                 var temp1 = size % chunkSize;
@@ -277,7 +281,7 @@ namespace HpkArchiver
                 for (var x = 1; x <= chunks; x++)
                 {
                     // Read the current chunk offset..
-                    var offset = br.ReadInt32();                    
+                    var offset = br.ReadInt32();
                     var zsize = 0;
 
                     // Store the stream position..
@@ -287,23 +291,45 @@ namespace HpkArchiver
                     zsize = x == chunks ? this.Fragments[0].Length : br.ReadInt32();
                     zsize -= offset;
 
+#if DEBUG
+                    Debug.WriteLine(
+                        $"Offset: {offset:X08} // ZSize: {zsize:X08} // NOffset: {(offset + zsize):X08} // Size: {compressedData.Length:X08} // ChunkSize: {chunkSize:X08} // Chunk: {x}/{chunks}"
+                        );
+#endif
+
                     // Restore the stream position..
                     br.BaseStream.Position = position;
-                    
+
                     // Handle the data accordingly..
                     if (zsize < chunkSize)
                     {
-                        var output = new byte[chunkSize];
-                        var ret = LZ4Codec.Decode(compressedData, offset, zsize, output, 0, chunkSize);
-                        if (ret > 0)
-                            fileData.AddRange(output.Take(ret));
-                        else
+                        try
                         {
-                            errorsCaught++;
-                            var sw = new StreamWriter(Static.ErrorFile, true);
-                            sw.WriteLine(dest + "\tWarning: Failed to decompress file.");
-                            sw.Flush();
-                            sw.Close();
+                            // LZ4 decompress the data..
+                            var output = new byte[chunkSize];
+                            var ret = LZ4Codec.Decode(compressedData, offset, zsize, output, 0, chunkSize, false);
+                            if (ret > 0)
+                                fileData.AddRange(output.Take(ret));
+                            else
+                            {
+                                errorsCaught++;
+                                var sw = new StreamWriter(Static.ErrorFile, true);
+                                sw.WriteLine(dest + "\tWarning: Failed to decompress file.");
+                                sw.Flush();
+                                sw.Close();
+                            }
+                        }
+                        catch
+                        {
+                            /**
+                             * LZ4 decompression failed, at this point from testing it appears
+                             * just appending the data that failed seems to be a valid method
+                             * of handling this error. Of the few files tested, this always created
+                             * valid output files.
+                             */
+                            var output = new byte[zsize];
+                            Array.Copy(compressedData, offset, output, 0, zsize);
+                            fileData.AddRange(output);
                         }
                     }
                     else

@@ -228,7 +228,7 @@ namespace HpkArchiver
                                 _ErrorsCaught += _FragmentedFileCollection[entry.FragmentIndex - 1].ExtractZippedFile(ref br, dest);
                             else
                             {
-                                if (Encoding.ASCII.GetString(data).Contains("LZ4"))
+                                if (Game == Game.VictorVran && Encoding.ASCII.GetString(data).Contains("LZ4"))
                                     _ErrorsCaught += _FragmentedFileCollection[entry.FragmentIndex - 1].ExtractZippedFileLZ4(ref br, dest);
                                 else
                                     _ErrorsCaught += _FragmentedFileCollection[entry.FragmentIndex - 1].ExtractFile(ref br, dest);
